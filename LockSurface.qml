@@ -15,11 +15,30 @@ import Qt5Compat.GraphicalEffects
 Rectangle {
     id: root
     required property LockContext context
-    // WlrLayershell.namespace: "quickshell:session"
 
     // Monitor name where the login field (centralBox) should appear
     readonly property string simplifiedMonitorName: "DP-1"
     readonly property bool isSimplifiedMonitor: screen?.name === root.simplifiedMonitorName
+
+    property real lockScreenScale: 0
+
+    Component.onCompleted: {
+        lockScreenScale = 1.0;
+    }
+
+    // Behavior on lockScreenScale {
+    //     animation: Appearance.animation.elementMove.numberAnimation.createObject(this);
+    // } @vaguesyntax way o animate, thx bro :)
+
+    Behavior on lockScreenScale {
+        NumberAnimation {
+            duration: 2000
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Appearance.animationCurves.expressiveSlowSpatial
+        }
+    }
+
+    opacity: lockScreenScale
 
     // Base wallpaper, same crop as the workspace
     Image {
@@ -43,7 +62,7 @@ Rectangle {
     Rectangle {
         anchors.fill: parent
         color: "#000000"
-        opacity: 0.6    // adjust between 0.15–0.35
+        opacity: 0.6
     }
 
     // NOISE
@@ -90,11 +109,6 @@ Rectangle {
 
         // show only in the main monitor
         visible: !root.isSimplifiedMonitor
-
-        Component.onCompleted: {
-            console.log("Current Monitor Name (LockSurface):", Wayland.outputName);
-            console.log("Target Monitor:", targetMonitor);
-        }
 
         property int spacingRow: 40
         property int sqrsize: 450 // makes the image fit snugly with centralBox
